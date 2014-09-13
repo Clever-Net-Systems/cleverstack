@@ -34,6 +34,10 @@ COMPUTE1_DNS2=62.1.3.6
 COMPUTE1_GW=62.1.2.254
 # The failover IPs associated to the controller node
 FAILOVERIPS=(212.1.2.3 212.1.3.4)
+# The global password
+PASSWORD=changeme
+# The partition that should be used as a PV for Cinder (Warning, this partition will be destroyed by the installation script)
+CINDERPV=/dev/sda2
 
 # Do not change anything beyond this point
 cat > /etc/hosts <<EOF
