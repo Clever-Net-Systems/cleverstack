@@ -36,7 +36,9 @@ COMPUTE1_GW=62.1.2.254
 FAILOVERIPS=(212.1.2.3 212.1.3.4)
 
 # Do not change anything beyond this point
-cat >> /etc/hosts <<EOF
+cat > /etc/hosts <<EOF
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 127.0.0.1	controller.$DOMAIN controller
 $CONTROLLER_PUBIP	controller-ext.$DOMAIN controller-ext
 $CONTROLLER_PRVIP	controller-int.$DOMAIN controller-int
@@ -88,13 +90,16 @@ EOF
 
 hostname controller.$DOMAIN
 
+###
+# Install Puppet server and required modules
+###
 yum -y install puppet-server
 service puppetmaster start
 chkconfig puppetmaster on
 
 cat >> /etc/puppet/puppet.conf <<EOF
     server = controller.$DOMAIN
-    report = true
+    report = false
     pluginsync = true
 EOF
 
@@ -106,52 +111,74 @@ puppet module install puppetlabs-glance
 puppet module install puppetlabs-horizon
 puppet module install puppetlabs-neutron
 puppet module install puppetlabs-postgresql
-puppet module install puppetlabs-puppetdb
 puppet module install puppetlabs-mongodb
 puppet module install puppetlabs-ceilometer
 puppet module install puppetlabs-heat
 puppet module install thias-bind
 
+# TODO Get files from github
 cp site.pp /etc/puppet/manifests/
 cp -aR cleverstack /etc/puppet/modules/
+# TODO Modify site.pp with values from script
 find /etc/puppet/modules -type f -exec chmod 644 {} \;
 find /etc/puppet/modules -type d -exec chmod 755 {} \;
 
 puppet agent --test
 
+# Create the br-ex OVS bridge (this cannot currently be done from the cleverstack module because we need to manually copy the hardware address of eth0 to br-ex). We modify ifcfg-br-ex and restart in the same command otherwise we lose connectivity
 puppet apply -e 'vs_bridge { 'br-ex': ensure => present }'
 puppet apply -e 'vs_port { 'eth0': ensure => present, bridge => 'br-ex', keep_ip => true }' && sed -i "s/..:..:..:..:..:../`ip a show dev eth0 | grep -o ..:..:..:..:..:.. | head -1`/" /etc/sysconfig/network-scripts/ifcfg-br-ex && service network restart
+# This will edit /etc/sysconfig/network-scripts/ifcfg-br-ex and change the OVS_EXTRA line to match the MAC address of eth0, and will prevent the switch behind the server from blocking traffic to/from an unkwown MAC address.
 
+# /usr/local/bin/stackrestart is just a simple script that restarts all OpenStack services in the right order
 stackrestart
+
+# Add additional IPs to the br-ex bridge (we need to add all our failover IPs as well as 10.88.15.1 which is an IP from extnet, our fake external network)
 for fip in ${FAILOVERIPS[@]}; do
 	ip addr add $fip/24 dev br-ex
 done
 ip addr add 10.88.15.1/24 dev br-ex
+# Restart named so it can attach to 10.88.15.1
 service named restart
 
-#Setup double SNAT solution (http://dachary.org/?p=2466)
+# Setup double SNAT solution (http://dachary.org/?p=2466)
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 $destip=3
 for fip in ${FAILOVERIPS[@]}; do
-	# back and forth
+	# Back and forth NAT between IPs from our fake external network and our failover IPs
 	iptables -t nat -A POSTROUTING -s 10.88.15.$destip/32 -j SNAT --to-source $fip
 	iptables -t nat -A PREROUTING -d $fip/32 -j DNAT --to-destination 10.88.15.$destip
 	destip=$((destip + 1))
 done
-# Any instance will SNAT through the first failover IP
+# Any instance that isn't assigned a floating IP will SNAT through the first failover IP
 iptables -t nat -A POSTROUTING -s 10.88.15.0/24 -j SNAT --to-source ${FAILOVERIPS[0]}
-
 iptables -I FORWARD 1 -s 10.88.15.0/24 -j ACCEPT
 iptables -I FORWARD 2 -d 10.88.15.0/24 -j ACCEPT
 
+# Allow DNS traffic from cloud instances trough dnsmasq, to our intermediary DNS on 10.88.15.1
 iptables -I INPUT 3 -s 10.88.15.2 -d 10.88.15.1 -p tcp --dport 53 -j ACCEPT
 iptables -I INPUT 3 -s 10.88.15.2 -d 10.88.15.1 -p udp --dport 53 -j ACCEPT
 
-iptables -I INPUT 3 -s 10.88.15.0/24 -d 10.88.15.1 -p tcp --dport 5000 -j ACCEPT
+###
+# ManageIQ specifics
+###
 
+# Allow traffic to Keystone for ManageIQ instance
+iptables -I INPUT 3 -s 10.88.15.0/24 -d 10.88.15.1 -p tcp --dport 5000 -j ACCEPT
+iptables -I INPUT 3 -s 10.88.15.0/24 -d 10.88.15.1 -p tcp --dport 35357 -j ACCEPT
+iptables -I INPUT 3 -s 10.88.15.0/24 -d 10.88.15.1 -p tcp --dport 9696 -j ACCEPT
+iptables -I INPUT 3 -s 10.88.15.0/24 -d 10.88.15.1 -p tcp --dport 9292 -j ACCEPT
+iptables -I INPUT 3 -s 10.88.15.0/24 -d 10.88.15.1 -p tcp --dport 8774 -j ACCEPT
+iptables -I INPUT 3 -s 10.88.15.0/24 -d 10.88.15.1 -p tcp --dport 8776 -j ACCEPT
+
+# Add Admin role for user admin in services tenant for ManageIQ
+keystone user-role-add --user admin --tenant services --role admin
+
+# Create the virtual network
 source /root/openrc
 netcreate
 
+# Download useful cloud images
 wget http://download.cirros-cloud.net/0.3.2/cirros-0.3.2-x86_64-disk.img
 wget http://manageiq.org/download/manageiq-openstack-devel.qc2
 wget ftp://ftp.free.fr/mirrors/ftp.centos.org/6.5/isos/x86_64/CentOS-6.5-x86_64-minimal.iso

@@ -17,10 +17,11 @@ Install steps:
 
 * On controller, download the controller installation script:
 ```
-# wget https://raw.githubusercontent.com/clevernet/cleverstack/master/install.sh
+# wget --no-check-certificate https://raw.githubusercontent.com/clevernet/cleverstack/master/install.sh
 ```
 * Adapt the script to your needs (read the comments in the script) and execute it:
 ```
+# chmod 755 install.sh
 # ./install.sh
 ```
 
