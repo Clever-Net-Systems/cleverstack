@@ -1,0 +1,12 @@
+#!/bin/bash
+
+LOGDIRS="/var/log/cinder /var/log/glance /var/log/ceilometer /var/log/horizon /var/log/keystone /var/log/neutron /var/log/nova /var/log/openvswitch /var/log/rabbitmq /var/log/libvirt /var/log/heat"
+
+for dir in $LOGDIRS; do
+	if [ -d $dir ]; then
+		for logfile in `ls -1 $dir/*.log`; do
+			export MTAILARGS="$MTAILARGS --label $logfile $logfile"
+		done
+	fi
+done
+/usr/bin/multitail --mergeall -E "(ERROR|WARN)" -N 0 $MTAILARGS

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+[ -x /etc/init.d/openvswitch ] && service openvswitch restart
+[ -x /etc/init.d/memcached ] && service memcached restart
+[ -x /etc/init.d/neutron-ovs-cleanup ] && service neutron-ovs-cleanup restart
+[ -x /etc/init.d/neutron-dhcp-agent ] && service neutron-dhcp-agent restart
+[ -x /etc/init.d/neutron-l3-agent ] && service neutron-l3-agent restart
+[ -x /etc/init.d/neutron-openvswitch-agent ] && service neutron-openvswitch-agent restart
+[ -x /etc/init.d/neutron-lbaas-agent  ] && service neutron-lbaas-agent restart
+[ -x /etc/init.d/neutron-server ] && service neutron-server restart
+[ -x /etc/init.d/openstack-cinder-api ] && service openstack-cinder-api restart
+[ -x /etc/init.d/openstack-cinder-scheduler ] && service openstack-cinder-scheduler restart
+[ -x /etc/init.d/openstack-cinder-volume ] && service openstack-cinder-volume restart
+[ -x /etc/init.d/openstack-glance-api ] && service openstack-glance-api restart
+[ -x /etc/init.d/openstack-glance-registry ] && service openstack-glance-registry restart
+[ -x /etc/init.d/openstack-keystone ] && service openstack-keystone restart
+[ -x /etc/init.d/openstack-nova-api ] && service openstack-nova-api restart
+[ -x /etc/init.d/openstack-nova-cert ] && service openstack-nova-cert restart
+[ -x /etc/init.d/openstack-nova-compute ] && service openstack-nova-compute restart
+[ -x /etc/init.d/openstack-nova-conductor ] && service openstack-nova-conductor restart
+[ -x /etc/init.d/openstack-nova-consoleauth ] && service openstack-nova-consoleauth restart
+[ -x /etc/init.d/openstack-nova-novncproxy ] && service openstack-nova-novncproxy restart
+[ -x /etc/init.d/openstack-nova-objectstore ] && service openstack-nova-objectstore restart
+[ -x /etc/init.d/openstack-nova-scheduler ] && service openstack-nova-scheduler restart
+[ -x /etc/init.d/openstack-heat-engine ] && service openstack-heat-engine restart
+[ -x /etc/init.d/openstack-heat-api ] && service openstack-heat-api restart
+[ -x /etc/init.d/openstack-heat-api-cfn ] && service openstack-heat-api-cfn restart
+[ -x /etc/init.d/openstack-ceilometer-api ] && service openstack-ceilometer-api restart
+[ -x /etc/init.d/openstack-ceilometer-collector ] && service openstack-ceilometer-collector restart
+[ -x /etc/init.d/openstack-ceilometer-notification ] && service openstack-ceilometer-notification restart
+[ -x /etc/init.d/openstack-ceilometer-alarm-notifier ] && service openstack-ceilometer-alarm-notifier restart
+[ -x /etc/init.d/openstack-ceilometer-alarm-evaluator ] && service openstack-ceilometer-alarm-evaluator restart
+[ -x /etc/init.d/openstack-ceilometer-central ] && service openstack-ceilometer-central restart
+[ -x /etc/init.d/openstack-ceilometer-compute ] && service openstack-ceilometer-compute restart

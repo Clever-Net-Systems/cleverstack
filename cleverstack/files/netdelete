@@ -1,0 +1,10 @@
+#!/bin/bash
+
+neutron router-interface-delete R1 intsubnet
+neutron router-delete R1
+neutron subnet-delete extsubnet
+neutron subnet-delete intsubnet
+neutron net-delete extnet
+neutron net-delete intnet
+
+for ns in `ip netns list`; do ip netns delete $ns; done

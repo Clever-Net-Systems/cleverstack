@@ -1,0 +1,9 @@
+#!/bin/bash
+
+neutron net-create extnet -- --router:external=True
+neutron net-create intnet
+neutron subnet-create --name extsubnet --disable-dhcp --allocation-pool=start=10.88.15.2,end=10.88.15.254 extnet 10.88.15.0/24
+neutron subnet-create --gateway 192.168.42.254 --name intsubnet intnet 192.168.42.0/24
+neutron router-create R1
+neutron router-gateway-set R1 extnet
+neutron router-interface-add R1 intsubnet
