@@ -120,13 +120,19 @@ puppet module install puppetlabs-ceilometer
 puppet module install puppetlabs-heat
 puppet module install thias-bind
 
-# TODO Get files from github
-cp site.pp /etc/puppet/manifests/
-cp -aR cleverstack /etc/puppet/modules/
-# TODO Modify site.pp with values from script
+yum -y install svn
+wget --no-check-certificate https://raw.githubusercontent.com/clevernet/cleverstack/master/site.pp -O /etc/puppet/manifests/site.pp
+sed -i "s/###PASSWORD###/$PASSWORD/" /etc/puppet/manifests/site.pp
+sed -i "sX###CINDERPV###X${CINDERPV}X" /etc/puppet/manifests/site.pp
+sed -i "s/###FORWARDER###/$CONTROLLER_DNS1/" /etc/puppet/manifests/site.pp
+svn export https://github.com/clevernet/cleverstack/trunk/cleverstack /etc/puppet/modules/cleverstack
 find /etc/puppet/modules -type f -exec chmod 644 {} \;
 find /etc/puppet/modules -type d -exec chmod 755 {} \;
 
+# We need to bring eth1 up before the Puppet run because daemons need to bind on it
+ifup eth1
+# The partition for Cinder needs to be unmounted
+umount $CINDERPV
 puppet agent --test
 
 # Create the br-ex OVS bridge (this cannot currently be done from the cleverstack module because we need to manually copy the hardware address of eth0 to br-ex). We modify ifcfg-br-ex and restart in the same command otherwise we lose connectivity
@@ -147,7 +153,7 @@ service named restart
 
 # Setup double SNAT solution (http://dachary.org/?p=2466)
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-$destip=3
+destip=3
 for fip in ${FAILOVERIPS[@]}; do
 	# Back and forth NAT between IPs from our fake external network and our failover IPs
 	iptables -t nat -A POSTROUTING -s 10.88.15.$destip/32 -j SNAT --to-source $fip
