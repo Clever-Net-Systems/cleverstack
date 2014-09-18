@@ -4,11 +4,6 @@ class cleverstack::compute (
   $password = 'password',
   $domain = '',
 ) {
-#  firewall { '1 eth1':
-#    proto   => 'all',
-#    iniface => 'eth1',
-#    action  => 'accept',
-#  }
   Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin', }
   class { 'nova':
     database_connection => "mysql://nova:${password}@${controllerint}/nova?charset=utf8",
@@ -71,13 +66,9 @@ class cleverstack::compute (
     database_connection => "mysql://keystone:${password}@${controllerint}/keystone",
     admin_token         => '84833d78d65ef3b009a6',
     admin_bind_host     => $controllerint,
-    enabled             => false, # Because we're not the controller TODO create a "common" class
+    enabled             => false, # Because we're not the controller
     mysql_module        => 2.2,
   }
-##  class { 'keystone::roles::admin':
-##    email    => "admin@$domain",
-##    password => $password,
-##  }
   class { '::neutron':
     verbose               => true,
     debug                 => false,
@@ -89,7 +80,7 @@ class cleverstack::compute (
     rabbit_host           => "${controllerint}",
     # We're not using aliases because of https://bugs.launchpad.net/ubuntu/+source/neutron/+bug/1304876
     core_plugin           => 'neutron.plugins.ml2.plugin.Ml2Plugin',
-    service_plugins       => ['neutron.services.l3_router.l3_router_plugin.L3RouterPlugin', 'neutron.services.firewall.fwaas_plugin.FirewallPlugin'],
+    service_plugins       => ['neutron.services.l3_router.l3_router_plugin.L3RouterPlugin', 'neutron.services.firewall.fwaas_plugin.FirewallPlugin', 'neutron.services.loadbalancer.plugin.LoadBalancerPlugin'],
   }
   class { '::neutron::server':
     auth_host      => $controllerint,
@@ -107,9 +98,6 @@ class cleverstack::compute (
     region           => 'RegionOne',
     tenant           => 'services',
   }
-#  class { 'neutron::agents::l3':
-#    enabled => false,
-#  }
   class { 'neutron::agents::ml2::ovs':
     enable_tunneling => true,
     local_ip         => ${computeint},

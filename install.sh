@@ -93,15 +93,24 @@ export PATH=$PATH:/usr/lib/rabbitmq/lib/rabbitmq_server-3.1.5/sbin
 EOF
 
 hostname controller.$DOMAIN
+export HOSTNAME=controller
 
 ###
 # Install Puppet server and required modules
 ###
 yum -y install puppet-server
-service puppetmaster start
+rm -rf /var/lib/puppet/ssl
+service puppetmaster restart
 chkconfig puppetmaster on
 
-cat >> /etc/puppet/puppet.conf <<EOF
+cat > /etc/puppet/puppet.conf <<EOF
+[main]
+    logdir = /var/log/puppet
+    rundir = /var/run/puppet
+    ssldir = $vardir/ssl
+[agent]
+    classfile = $vardir/classes.txt
+    localconfig = $vardir/localconfig
     server = controller.$DOMAIN
     report = false
     pluginsync = true
@@ -126,7 +135,7 @@ sed -i "s/###PASSWORD###/$PASSWORD/" /etc/puppet/manifests/site.pp
 sed -i "sX###CINDERPV###X${CINDERPV}X" /etc/puppet/manifests/site.pp
 sed -i "s/###FORWARDER###/$CONTROLLER_DNS1/" /etc/puppet/manifests/site.pp
 sed -i "s/###DOMAIN###/$DOMAIN/" /etc/puppet/manifests/site.pp
-svn export https://github.com/clevernet/cleverstack/trunk/cleverstack /etc/puppet/modules/cleverstack
+svn export --force https://github.com/clevernet/cleverstack/trunk/cleverstack /etc/puppet/modules/cleverstack
 find /etc/puppet/modules -type f -exec chmod 644 {} \;
 find /etc/puppet/modules -type d -exec chmod 755 {} \;
 
