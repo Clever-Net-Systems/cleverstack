@@ -2,15 +2,16 @@ class cleverstack::cinder(
   $password      = '',
   $controllerint = '',
   $cinderpv      = '',
+  $domain        = '',
 ) {
   class { '::cinder::db::mysql':
     password      => $password,
-    allowed_hosts => '%.clevernetsystems.com',
+    allowed_hosts => "%.$domain",
     mysql_module  => 2.2,
   }
   class { '::cinder::keystone::auth':
     password         => $password,
-    email            => 'admin@clevernetsystems.com',
+    email            => "admin@$domain",
     public_address   => $controllerint,
     admin_address    => $controllerint,
     internal_address => $controllerint,

@@ -5,6 +5,7 @@ class cleverstack::controller (
   $password      = 'password',
   $cinderpv      = 'NEPASSETROMPER',
   $forwarders    = '',
+  $domain        = '',
 ) {
   firewall { '8080 (PuppetDB)':
     proto  => 'tcp',
@@ -62,14 +63,17 @@ class cleverstack::controller (
   class { '::cleverstack::keystone':
     password      => $password,
     controllerint => $controllerint,
+    domain        => $domain,
   }
   class { '::cleverstack::glance':
     password      => $password,
     controllerint => $controllerint,
+    domain        => $domain,
   }
   class { '::cleverstack::nova':
     password      => $password,
     controllerint => $controllerint,
+    domain        => $domain,
   }
   class { '::cleverstack::horizon':
     password      => $password,
@@ -79,11 +83,13 @@ class cleverstack::controller (
     password      => $password,
     controllerint => $controllerint,
     computeint    => $computeint,
+    domain        => $domain,
   }
   class { '::cleverstack::cinder':
     password      => $password,
     controllerint => $controllerint,
     cinderpv      => $cinderpv,
+    domain        => $domain,
   }
   class { '::cleverstack::bind':
     forwarders  => $forwarders,
@@ -91,6 +97,7 @@ class cleverstack::controller (
   class { '::cleverstack::heat':
     password      => $password,
     controllerint => $controllerint,
+    domain        => $domain,
   }
   class { '::cleverstack::ceilometer':
     password      => $password,

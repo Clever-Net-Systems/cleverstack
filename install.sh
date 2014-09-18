@@ -125,6 +125,7 @@ wget --no-check-certificate https://raw.githubusercontent.com/clevernet/cleverst
 sed -i "s/###PASSWORD###/$PASSWORD/" /etc/puppet/manifests/site.pp
 sed -i "sX###CINDERPV###X${CINDERPV}X" /etc/puppet/manifests/site.pp
 sed -i "s/###FORWARDER###/$CONTROLLER_DNS1/" /etc/puppet/manifests/site.pp
+sed -i "s/###DOMAIN###/$DOMAIN/" /etc/puppet/manifests/site.pp
 svn export https://github.com/clevernet/cleverstack/trunk/cleverstack /etc/puppet/modules/cleverstack
 find /etc/puppet/modules -type f -exec chmod 644 {} \;
 find /etc/puppet/modules -type d -exec chmod 755 {} \;

@@ -1,12 +1,13 @@
 class cleverstack::heat(
   $password      = '',
   $controllerint = '',
+  $domain        = '',
 ) {
   class { 'heat::db::mysql':
     dbname        => 'heat',
     user          => 'heat',
     password      => $password,
-    allowed_hosts => '%.clevernetsystems.com',
+    allowed_hosts => "%.$domain",
     mysql_module  => 2.2,
   } ->
   class { '::heat':

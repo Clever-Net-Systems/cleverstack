@@ -2,6 +2,7 @@ class cleverstack::neutron(
   $password      = '',
   $controllerint = '',
   $computeint    = '',
+  $domain        = '',
 ) {
   class { '::neutron':
     verbose               => true,
@@ -26,7 +27,7 @@ class cleverstack::neutron(
     user          => 'neutron',
     password      => $password,
     dbname        => 'neutron',
-    allowed_hosts => [ '%.clevernetsystems.com', $computeint ],
+    allowed_hosts => [ "%.$domain", $computeint ],
     mysql_module  => 2.2,
   }
   class { '::neutron::keystone::auth':
@@ -41,7 +42,7 @@ class cleverstack::neutron(
   # In a normal setup, we wouldn't need this but since we're using a fake external subnet, we need to proxy DNS requests.
   # See further below for the installation of the named daemon.
   neutron_dhcp_agent_config {
-    'DEFAULT/dhcp_domain':         value => 'clevernetsystems.com';
+    'DEFAULT/dhcp_domain':         value => "$domain";
     'DEFAULT/dnsmasq_dns_servers': value => '10.88.15.1';
   }
   class { 'neutron::agents::l3':

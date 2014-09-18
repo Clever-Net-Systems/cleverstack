@@ -1,12 +1,13 @@
 class cleverstack::keystone(
   $password      = '',
   $controllerint = '',
+  $domain        = '',
 ) {
   class { '::keystone::db::mysql':
     dbname        => 'keystone',
     user          => 'keystone',
     password      => $password,
-    allowed_hosts => '%.clevernetsystems.com',
+    allowed_hosts => "%.$domain",
     # Prevents the following error: Error 400 on SERVER: Could not find class mysql::python
     mysql_module  => 2.2,
   }
@@ -19,11 +20,11 @@ class cleverstack::keystone(
     mysql_module        => 2.2,
   }
   class { '::keystone::roles::admin':
-    email    => 'admin@clevernetsystems.com',
+    email    => "admin@$domain",
     password => $password,
   }
   class { '::keystone::endpoint':
-    public_url => "http://${controllerint}.clevernetsystems.com:5000/",
-    admin_url  => "http://${controllerint}.clevernetsystems.com:35357/",
+    public_url => "http://${controllerint}.$domain:5000/",
+    admin_url  => "http://${controllerint}.$domain:35357/",
   }
 }

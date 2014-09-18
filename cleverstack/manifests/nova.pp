@@ -1,10 +1,11 @@
 class cleverstack::nova(
   $password      = '',
   $controllerint = '',
+  $domain = '',
 ) {
   class { 'nova::db::mysql':
     password      => $password,
-    allowed_hosts => '%.clevernetsystems.com',
+    allowed_hosts => "%.$domain",
     mysql_module  => 2.2,
   }
   class { '::nova':
@@ -43,10 +44,10 @@ class cleverstack::nova(
     enabled                       => true,
     vnc_enabled                   => true,
     #vnc_keymap                    => 'fr-ch',
-    vncproxy_host                 => 'controller.clevernetsystems.com',
+    vncproxy_host                 => "controller.$domain",
     vncserver_proxyclient_address => $controllerint,
-    #novncproxy_base_url           => 'http://controller.clevernetsystems.com:6080/vnc_auto.html',
-    #xvpvncproxy_base_url          => 'http://controller.clevernetsystems.com:6081/console',
+    #novncproxy_base_url           => "http://controller.$domain:6080/vnc_auto.html",
+    #xvpvncproxy_base_url          => "http://controller.$domain:6081/console",
     #vncserver_listen              => $controllerint,
   }
   class { 'nova::compute::libvirt':

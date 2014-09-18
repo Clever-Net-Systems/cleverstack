@@ -2,6 +2,7 @@ class cleverstack::compute (
   $controllerext = 'controller-ext',
   $controllerint = 'controller-int',
   $password = 'password',
+  $domain = '',
 ) {
 #  firewall { '1 eth1':
 #    proto   => 'all',
@@ -32,10 +33,10 @@ class cleverstack::compute (
     enabled                       => true,
     vnc_enabled                   => true,
     #vnc_keymap                    => 'fr-ch',
-    vncproxy_host                 => 'controller.clevernetsystems.com',
+    vncproxy_host                 => "controller.$domain",
     vncserver_proxyclient_address => $controllerint,
-    #novncproxy_base_url           => 'http://controller.clevernetsystems.com:6080/vnc_auto.html',
-    #xvpvncproxy_base_url          => 'http://controller.clevernetsystems.com:6081/console',
+    #novncproxy_base_url           => "http://controller.$domain:6080/vnc_auto.html",
+    #xvpvncproxy_base_url          => "http://controller.$domain:6081/console",
     #vncserver_listen              => $controllerint,
   }
   class { 'nova::compute::libvirt':
@@ -74,7 +75,7 @@ class cleverstack::compute (
     mysql_module        => 2.2,
   }
 ##  class { 'keystone::roles::admin':
-##    email    => 'admin@clevernetsystems.com',
+##    email    => "admin@$domain",
 ##    password => $password,
 ##  }
   class { '::neutron':
