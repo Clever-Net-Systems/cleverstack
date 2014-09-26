@@ -25,6 +25,12 @@ class cleverstack::controller (
     action => 'accept',
     port   => 6080,
   }
+  firewall { '8140 (Puppet)':
+    proto  => 'tcp',
+    state  => ['NEW'],
+    action => 'accept',
+    port   => 8140,
+  }
   # Memcached
   class { 'memcached':
     listen_ip => $controllerint,
