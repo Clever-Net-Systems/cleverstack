@@ -1,11 +1,18 @@
 class cleverstack::compute (
   $controllerext = 'controller-ext',
   $controllerint = 'controller-int',
-  $password = 'password',
-  $domain = '',
+  $computeint    = 'compute-int',
+  $computeext    = 'compute-ext',
+  $password      = 'password',
+  $domain        = '',
 ) {
+  firewall { '1 eth1':
+    proto   => 'all',
+    iniface => 'eth1',
+    action  => 'accept',
+  }
   Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin', }
-  class { 'nova':
+  class { '::nova':
     database_connection => "mysql://nova:${password}@${controllerint}/nova?charset=utf8",
     glance_api_servers  => "http://${controllerint}:9292",
     image_service       => 'nova.image.glance.GlanceImageService',
@@ -24,7 +31,7 @@ class cleverstack::compute (
     admin_tenant_name                    => 'services',
     neutron_metadata_proxy_shared_secret => $password,
   }
-  class { 'nova::compute':
+  class { '::nova::compute':
     enabled                       => true,
     vnc_enabled                   => true,
     #vnc_keymap                    => 'fr-ch',
@@ -34,7 +41,7 @@ class cleverstack::compute (
     #xvpvncproxy_base_url          => "http://controller.$domain:6081/console",
     #vncserver_listen              => $controllerint,
   }
-  class { 'nova::compute::libvirt':
+  class { '::nova::compute::libvirt':
     migration_support => true,
     vncserver_listen  => '0.0.0.0',
   }
@@ -52,21 +59,21 @@ class cleverstack::compute (
     enabled => false, # because compute node
   }
   class { [
-    'nova::scheduler',
-    'nova::objectstore',
-    'nova::cert',
-    'nova::consoleauth',
-    'nova::conductor'
+    '::nova::scheduler',
+    '::nova::objectstore',
+    '::nova::cert',
+    '::nova::consoleauth',
+    '::nova::conductor'
   ]:
     enabled => false, # because compute node
   }
-  class { 'keystone':
+  class { '::keystone':
     verbose             => true,
     debug               => true,
     database_connection => "mysql://keystone:${password}@${controllerint}/keystone",
     admin_token         => '84833d78d65ef3b009a6',
     admin_bind_host     => $controllerint,
-    enabled             => false, # Because we're not the controller
+    enabled             => false, # Because we're not the controller TODO create a "common" class
     mysql_module        => 2.2,
   }
   class { '::neutron':
@@ -80,7 +87,7 @@ class cleverstack::compute (
     rabbit_host           => "${controllerint}",
     # We're not using aliases because of https://bugs.launchpad.net/ubuntu/+source/neutron/+bug/1304876
     core_plugin           => 'neutron.plugins.ml2.plugin.Ml2Plugin',
-    service_plugins       => ['neutron.services.l3_router.l3_router_plugin.L3RouterPlugin', 'neutron.services.firewall.fwaas_plugin.FirewallPlugin', 'neutron.services.loadbalancer.plugin.LoadBalancerPlugin'],
+    service_plugins       => ['neutron.services.l3_router.l3_router_plugin.L3RouterPlugin', 'neutron.services.firewall.fwaas_plugin.FirewallPlugin'],
   }
   class { '::neutron::server':
     auth_host      => $controllerint,
@@ -98,20 +105,20 @@ class cleverstack::compute (
     region           => 'RegionOne',
     tenant           => 'services',
   }
-  class { 'neutron::agents::ml2::ovs':
+  class { '::neutron::agents::ml2::ovs':
     enable_tunneling => true,
-    local_ip         => ${computeint},
+    local_ip         => $computeint,
     enabled          => true,
     tunnel_types     => [ 'gre' ],
   }
   # ml2 plugin with gre as ml2 driver and ovs as mechanism driver
-  class { 'neutron::plugins::ml2':
+  class { '::neutron::plugins::ml2':
     type_drivers          => ['flat','gre'],
     tenant_network_types  => ['flat','gre'],
     mechanism_drivers     => ['openvswitch'],
     tunnel_id_ranges      => ['1:1000']
   }
-  class { 'neutron::server::notifications':
+  class { '::neutron::server::notifications':
     nova_admin_tenant_name     => 'services',
     nova_admin_password        => $password,
     nova_url                   => "http://${controllerint}:8774/v2",

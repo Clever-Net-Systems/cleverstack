@@ -69,13 +69,15 @@ class cleverstack (
     ensure => latest,
     require => Yumrepo['rdo-release'],
   }
-  # MySQL
-  # We need to set the default engine to InnoDB because of https://bugs.launchpad.net/neutron/+bug/1288358
-  class { 'mysql::server':
-    root_password      => $password,
-    override_options   => { 'mysqld' => { 'bind_address' => $controllerint, 'default-storage-engine' => 'InnoDB' } },
-  } ->
-  class { 'mysql::server::account_security': }
+  if $hostname =~ /^controller/ {
+    # MySQL
+    # We need to set the default engine to InnoDB because of https://bugs.launchpad.net/neutron/+bug/1288358
+    class { 'mysql::server':
+      root_password      => $password,
+      override_options   => { 'mysqld' => { 'bind_address' => $controllerint, 'default-storage-engine' => 'InnoDB' } },
+    } ->
+    class { 'mysql::server::account_security': }
+  }
   file { '/usr/local/bin/stackrestart':
     source => "puppet:///modules/cleverstack/stackrestart",
     ensure => file,

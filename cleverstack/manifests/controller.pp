@@ -7,6 +7,11 @@ class cleverstack::controller (
   $forwarders    = '',
   $domain        = '',
 ) {
+  firewall { '1 eth1':
+    proto   => 'all',
+    iniface => 'eth1',
+    action  => 'accept',
+  }
   firewall { '8080 (PuppetDB)':
     proto  => 'tcp',
     state  => ['NEW'],
