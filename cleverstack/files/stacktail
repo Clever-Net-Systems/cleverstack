@@ -9,4 +9,4 @@ for dir in $LOGDIRS; do
 		done
 	fi
 done
-/usr/bin/multitail --mergeall -E "(ERROR|WARN)" -N 0 $MTAILARGS
+/usr/bin/multitail --mergeall -E "(ERROR|WARN|CRIT)" -N 0 $MTAILARGS

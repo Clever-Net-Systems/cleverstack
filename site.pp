@@ -5,14 +5,15 @@ node /controller/ {
     password      => '###PASSWORD###',
   } ->
   class { 'cleverstack::controller':
-    controllerext => 'controller-ext',
-    controllerint => 'controller-int',
-    computeint    => 'compute-int',
-    password      => '###PASSWORD###',
-    cinderpv      => '###CINDERPV###',
-    domain        => '###DOMAIN###',
-    forwarders    => [ '###FORWARDER###' ],
-    require => Class['cleverstack'],
+    controllerext   => 'controller-ext',
+    ipcontrollerint => '###IPCONTROLLERINT###',
+    controllerint   => 'controller-int',
+    computeint      => 'compute-int',
+    password        => '###PASSWORD###',
+    cinderpv        => '###CINDERPV###',
+    domain          => '###DOMAIN###',
+    forwarders      => [ '###FORWARDER###' ],
+    require         => Class['cleverstack'],
   }
 }
 
@@ -24,6 +25,7 @@ node /compute1/ {
   } ->
   class { 'cleverstack::compute':
     computeext    => 'compute-ext',
+    ipcomputeint  => '###IPCOMPUTEINT###',
     computeint    => 'compute-int',
     controllerext => 'controller-ext',
     controllerint => 'controller-int',

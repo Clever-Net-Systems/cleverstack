@@ -145,6 +145,8 @@ EOF
 	sed -i "sX###CINDERPV###X${CINDERPV}X" /etc/puppet/manifests/site.pp
 	sed -i "s/###FORWARDER###/$CONTROLLER_DNS1/" /etc/puppet/manifests/site.pp
 	sed -i "s/###DOMAIN###/$DOMAIN/" /etc/puppet/manifests/site.pp
+	sed -i "s/###IPCOMPUTEINT###/$COMPUTE1_PRVIP/" /etc/puppet/manifests/site.pp
+	sed -i "s/###IPCONTROLLERINT###/$CONTROLLER_PRVIP/" /etc/puppet/manifests/site.pp
 	svn export --force https://github.com/clevernet/cleverstack/trunk/cleverstack /etc/puppet/modules/cleverstack
 	find /etc/puppet/modules -type f -exec chmod 644 {} \;
 	find /etc/puppet/modules -type d -exec chmod 755 {} \;
