@@ -37,7 +37,7 @@ class cleverstack::compute (
     vnc_enabled                   => true,
     #vnc_keymap                    => 'fr-ch',
     vncproxy_host                 => "controller.$domain",
-    vncserver_proxyclient_address => $controllerint,
+    vncserver_proxyclient_address => $computeint,
     #novncproxy_base_url           => "http://controller.$domain:6080/vnc_auto.html",
     #xvpvncproxy_base_url          => "http://controller.$domain:6081/console",
     #vncserver_listen              => $controllerint,

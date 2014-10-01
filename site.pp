@@ -26,7 +26,7 @@ node /compute1/ {
   class { 'cleverstack::compute':
     computeext    => 'compute-ext',
     ipcomputeint  => '###IPCOMPUTEINT###',
-    computeint    => 'compute-int',
+    computeint    => 'compute1-int',
     controllerext => 'controller-ext',
     controllerint => 'controller-int',
     password      => '###PASSWORD###',
