@@ -34,13 +34,14 @@ class cleverstack::compute (
   }
   class { '::nova::compute':
     enabled                       => true,
-    vnc_enabled                   => true,
-    #vnc_keymap                    => 'fr-ch',
-    vncproxy_host                 => "controller.$domain",
-    vncserver_proxyclient_address => $computeint,
-    #novncproxy_base_url           => "http://controller.$domain:6080/vnc_auto.html",
-    #xvpvncproxy_base_url          => "http://controller.$domain:6081/console",
-    #vncserver_listen              => $controllerint,
+    vnc_enabled                   => false,
+  }
+  class { 'nova::compute::spice':
+    agent_enabled                 => true,
+    server_listen                 => '0.0.0.0',
+    server_proxyclient_address    => $computeint,
+    keymap                        => 'fr_CH',
+    proxy_host                    => "controller.$domain",
   }
   class { '::nova::compute::libvirt':
     migration_support => true,
@@ -55,9 +56,9 @@ class cleverstack::compute (
     vif_plugging_is_fatal  => false,
     vif_plugging_timeout   => '0',
   }
-  class { '::nova::vncproxy':
-    host    => "controller-ext",
-    enabled => false, # because compute node
+  class { '::nova::spicehtml5proxy':
+    enabled        => false,
+    host           => $controllerext,
   }
   class { [
     '::nova::scheduler',
