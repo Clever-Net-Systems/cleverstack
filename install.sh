@@ -210,6 +210,10 @@ EOF
 	source /root/openrc
 	netcreate
 
+	# Allow ping and ssh access by default to instances
+	nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
+	nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
+
 	# Download useful cloud images
 	wget http://download.cirros-cloud.net/0.3.2/cirros-0.3.2-x86_64-disk.img
 	wget http://manageiq.org/download/manageiq-openstack-devel.qc2
