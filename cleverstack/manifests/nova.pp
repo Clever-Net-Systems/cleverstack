@@ -31,9 +31,13 @@ class cleverstack::nova(
 #    host    => $controllerext,
 #    enabled => true,
 #  }
+  package { 'spice-html5':
+    ensure => installed,
+  }
   class { '::nova::spicehtml5proxy':
-    enabled        => true,
-    host           => $controllerext,
+    enabled => true,
+    host    => $controllerext,
+    require => Package['spice-html5'],
   }
   class { [
     'nova::scheduler',
