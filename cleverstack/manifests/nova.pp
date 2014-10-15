@@ -27,18 +27,18 @@ class cleverstack::nova(
     admin_tenant_name                    => 'services',
     neutron_metadata_proxy_shared_secret => $password,
   }
-#  class { '::nova::vncproxy':
-#    host    => $controllerext,
-#    enabled => true,
-#  }
-  package { 'spice-html5':
-    ensure => installed,
-  }
-  class { '::nova::spicehtml5proxy':
-    enabled => true,
+  class { '::nova::vncproxy':
     host    => $controllerext,
-    require => Package['spice-html5'],
+    enabled => true,
   }
+#  package { 'spice-html5':
+#    ensure => installed,
+#  }
+#  class { '::nova::spicehtml5proxy':
+#    enabled => true,
+#    host    => $controllerext,
+#    require => Package['spice-html5'],
+#  }
   class { [
     'nova::scheduler',
     'nova::objectstore',
@@ -48,27 +48,27 @@ class cleverstack::nova(
   ]:
     enabled => true,
   }
-#  class { 'nova::compute':
-#    enabled                       => true,
-#    vnc_enabled                   => true,
-#    #vnc_keymap                    => 'fr-ch',
-#    vncproxy_host                 => "controller.$domain",
-#    vncserver_proxyclient_address => $controllerint,
-#    #novncproxy_base_url           => "http://controller.$domain:6080/vnc_auto.html",
-#    #xvpvncproxy_base_url          => "http://controller.$domain:6081/console",
-#    #vncserver_listen              => $controllerint,
-#  }
   class { 'nova::compute':
     enabled                       => true,
-    vnc_enabled                   => false,
+    vnc_enabled                   => true,
+    #vnc_keymap                    => 'fr-ch',
+    vncproxy_host                 => "controller.$domain",
+    vncserver_proxyclient_address => $controllerint,
+    #novncproxy_base_url           => "http://controller.$domain:6080/vnc_auto.html",
+    #xvpvncproxy_base_url          => "http://controller.$domain:6081/console",
+    #vncserver_listen              => $controllerint,
   }
-  class { 'nova::compute::spice':
-    agent_enabled                 => true,
-    server_listen                 => '0.0.0.0',
-    server_proxyclient_address    => $controllerint,
-    keymap                        => 'fr_CH',
-    proxy_host                    => "controller.$domain",
-  }
+#  class { 'nova::compute':
+#    enabled                       => true,
+#    vnc_enabled                   => false,
+#  }
+#  class { 'nova::compute::spice':
+#    agent_enabled                 => true,
+#    server_listen                 => '0.0.0.0',
+#    server_proxyclient_address    => $controllerint,
+#    keymap                        => 'fr_CH',
+#    proxy_host                    => "controller.$domain",
+#  }
   class { 'nova::compute::libvirt':
     migration_support => true,
     vncserver_listen  => '0.0.0.0',

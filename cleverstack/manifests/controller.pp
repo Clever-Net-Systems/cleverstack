@@ -25,18 +25,18 @@ class cleverstack::controller (
     action => 'accept',
     port   => 80,
   }
-  firewall { '6082 (spiceproxy)':
-    proto  => 'tcp',
-    state  => ['NEW'],
-    action => 'accept',
-    port   => 6082,
-  }
-#  firewall { '6080 (novncproxy)':
+#  firewall { '6082 (spiceproxy)':
 #    proto  => 'tcp',
 #    state  => ['NEW'],
 #    action => 'accept',
-#    port   => 6080,
+#    port   => 6082,
 #  }
+  firewall { '6080 (novncproxy)':
+    proto  => 'tcp',
+    state  => ['NEW'],
+    action => 'accept',
+    port   => 6080,
+  }
   firewall { '8140 (Puppet)':
     proto  => 'tcp',
     state  => ['NEW'],
