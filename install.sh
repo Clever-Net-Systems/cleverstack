@@ -137,6 +137,7 @@ EOF
 	puppet module install puppetlabs-mongodb
 	puppet module install puppetlabs-ceilometer
 	puppet module install puppetlabs-heat
+	puppet module install puppetlabs-swift
 	puppet module install thias-bind
 
 	yum -y install svn

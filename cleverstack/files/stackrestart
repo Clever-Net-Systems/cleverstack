@@ -32,3 +32,17 @@
 [ -x /etc/init.d/openstack-ceilometer-alarm-evaluator ] && service openstack-ceilometer-alarm-evaluator restart
 [ -x /etc/init.d/openstack-ceilometer-central ] && service openstack-ceilometer-central restart
 [ -x /etc/init.d/openstack-ceilometer-compute ] && service openstack-ceilometer-compute restart
+[ -x /etc/init.d/openstack-swift-account ] && /etc/init.d/openstack-swift-account restart
+[ -x /etc/init.d/openstack-swift-account-auditor ] && /etc/init.d/openstack-swift-account-auditor restart
+[ -x /etc/init.d/openstack-swift-account-reaper ] && /etc/init.d/openstack-swift-account-reaper restart
+[ -x /etc/init.d/openstack-swift-account-replicator ] && /etc/init.d/openstack-swift-account-replicator restart
+[ -x /etc/init.d/openstack-swift-container ] && /etc/init.d/openstack-swift-container restart
+[ -x /etc/init.d/openstack-swift-container-auditor ] && /etc/init.d/openstack-swift-container-auditor restart
+[ -x /etc/init.d/openstack-swift-container-replicator ] && /etc/init.d/openstack-swift-container-replicator restart
+[ -x /etc/init.d/openstack-swift-container-updater ] && /etc/init.d/openstack-swift-container-updater restart
+[ -x /etc/init.d/openstack-swift-object ] && /etc/init.d/openstack-swift-object restart
+[ -x /etc/init.d/openstack-swift-object-auditor ] && /etc/init.d/openstack-swift-object-auditor restart
+[ -x /etc/init.d/openstack-swift-object-expirer ] && /etc/init.d/openstack-swift-object-expirer restart
+[ -x /etc/init.d/openstack-swift-object-replicator ] && /etc/init.d/openstack-swift-object-replicator restart
+[ -x /etc/init.d/openstack-swift-object-updater ] && /etc/init.d/openstack-swift-object-updater restart
+[ -x /etc/init.d/openstack-swift-proxy ] && /etc/init.d/openstack-swift-proxy restart

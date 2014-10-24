@@ -130,4 +130,9 @@ class cleverstack::controller (
     admin_password  => $password,
     controller_node => $controllerint,
   }
+  class { '::cleverstack::swift':
+    password      => $password,
+    controllerint => $controllerint,
+    ipcontrollerint => $ipcontrollerint,
+  }
 }

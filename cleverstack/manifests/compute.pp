@@ -156,4 +156,57 @@ class cleverstack::compute (
     group  => root,
     mode   => 0755,
   }
+  class { '::ceilometer':
+    metering_secret => $password,
+    debug           => True,
+    verbose         => True,
+    rabbit_hosts    => [$controllerint],
+    rabbit_userid   => 'rabbitmq',
+    rabbit_password => $password,
+  }
+  class { '::ceilometer::api':
+    enabled           => false,
+    keystone_host     => $controllerint,
+    keystone_password => $password,
+  }
+  class { '::ceilometer::db':
+    database_connection => "mongodb://${controllerint}:27017/ceilometer",
+    mysql_module        => '2.2',
+  }
+  class { '::ceilometer::agent::auth':
+    auth_url      => "http://${controllerint}:5000/v2.0",
+    auth_password => $password,
+    auth_region   => 'RegionOne',
+  } ->
+  class { '::ceilometer::agent::compute': }
+  # Second Swift storage node
+  class { '::swift':
+    swift_hash_suffix => $password,
+  }
+  swift::storage::loopback { '1':
+    base_dir     => '/srv/swift-loopback',
+    mnt_base_dir => '/srv/node',
+    byte_size    => 1024,
+    seek         => 10000,
+    fstype       => 'ext4',
+    require      => Class['::swift'],
+  }
+  class { '::swift::storage::all':
+    storage_local_net_ip => $computeint
+  }
+  @@ring_object_device { "$ipcomputeint:6000/1":
+    zone   => 1,
+    weight => 1,
+  }
+  @@ring_container_device { "$ipcomputeint:6001/1":
+    zone   => 1,
+    weight => 1,
+  }
+  @@ring_account_device { "$ipcomputeint:6002/1":
+    zone   => 1,
+    weight => 1,
+  }
+  swift::ringsync { ['account','container','object']: 
+    ring_server => $controllerint, 
+  }
 }

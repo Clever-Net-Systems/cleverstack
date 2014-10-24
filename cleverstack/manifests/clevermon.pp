@@ -11,12 +11,12 @@ class cleverstack::clevermon (
   $nova_endpoint_type       = 'publicURL',
   $neutron_endpoint_type    = 'publicURL',
 ) {
-  file { '/etc/cron.d/clevermon':
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    content => template("cleverstack/clevermon"),
-  }
+#  file { '/etc/cron.d/clevermon':
+#    owner   => 'root',
+#    group   => 'root',
+#    mode    => '0644',
+#    content => template("cleverstack/clevermon"),
+#  }
   file { '/etc/httpd/conf.d/monitor.conf':
     source => "puppet:///modules/cleverstack/monitor.conf",
     ensure => file,
