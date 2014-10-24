@@ -117,13 +117,19 @@ EOF
 	service puppetmaster restart
 	chkconfig puppetmaster on
 
-	cat >> /etc/puppet/puppet.conf <<EOF
-    server = controller.$DOMAIN
-    report = false
-    pluginsync = true
-
+	cat > /etc/puppet/puppet.conf <<EOF
+[main]
+    logdir = /var/log/puppet
+    rundir = /var/run/puppet
+    ssldir = $vardir/ssl
 [master]
     autosign = true
+[agent]
+    classfile = $vardir/classes.txt
+    localconfig = $vardir/localconfig
+    server = controller.clevernetsystems.com
+    report = false
+    pluginsync = true
 EOF
 
 	puppet module install puppetlabs-apache
